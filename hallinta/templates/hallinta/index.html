@@ -1,0 +1,8 @@
+<h1>Kaikki asiakkaat</h1>
+{% if kaikki_asiakkaat %}
+	<ul>
+	{% for asiakas in kaikki_asiakkaat %}
+		<li><a href="{% url 'hallinta:asiakastieto' asiakas.id %}">{{ asiakas.nimi }}</a></li>
+	{% endfor %}
+	</ul>
+{% endif %}

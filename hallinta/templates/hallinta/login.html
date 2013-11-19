@@ -1,0 +1,16 @@
+{% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
+<form action="{% url 'hallinta:login_handle' %}" method="post" >
+{% csrf_token %}
+	<table>
+		<tr>
+			<th>User:</th><td><input type="text" name="username" /></td>
+		</tr>
+		<tr>
+			<th>Password:</th><td><input type="password" name="password" /></td>
+		</tr>
+		<tr>
+			<td colspan="2"><input type="submit"/></td>
+		</tr>
+	</table>
+	
+</form>

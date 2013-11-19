@@ -1,8 +1,17 @@
-<h1>Kaikki asiakkaat</h1>
-{% if kaikki_asiakkaat %}
-	<ul>
-	{% for asiakas in kaikki_asiakkaat %}
-		<li><a href="{% url 'hallinta:asiakastieto' asiakas.id %}">{{ asiakas.nimi }}</a></li>
-	{% endfor %}
-	</ul>
+{% if user.is_authenticated %}
+	
+	<a href="{% url 'hallinta:logout_handle' %}">Log out</a>
+
+	<h1>All customers</h1>
+	{% if all_customers %}
+		<ul>
+		{% for customer in all_customers %}
+			<li><a href="{% url 'hallinta:customerinfo' customer.id %}">{{ customer.name }}</a></li>
+		{% endfor %}
+		</ul>
+	{% endif %}
+
+{% else %}
+<!-- redirect to login page -->
+	<meta http-equiv="REFRESH" content="0;url={% url 'hallinta:login' %}">
 {% endif %}

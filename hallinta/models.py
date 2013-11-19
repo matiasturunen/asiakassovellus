@@ -1,22 +1,22 @@
 from django.db import models
 
-class Asiakas(models.Model):
-    nimi = models.CharField(max_length=200)
-    osoite = models.CharField(max_length=200)
-    lisatieto = models.TextField()
+class Customer(models.Model):
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=200)
+    extrainfo = models.TextField()
     
-    #hiukan siistimpi nimi
+    # better name
     def __unicode__(self):
-        return self.nimi
+        return self.name
     
-class Yhteyshenkilo(models.Model):
-    asiakas = models.ForeignKey(Asiakas)
-    nimi = models.CharField(max_length=200)
-    sukunimi = models.CharField(max_length=200)
-    tyonkuva = models.CharField(max_length=200)
-    puh = models.CharField(max_length=40)
+class Contact(models.Model):
+    customer = models.ForeignKey(Customer)
+    name = models.CharField(max_length=200)
+    lastname = models.CharField(max_length=200)
+    job = models.CharField(max_length=200)
+    phone = models.CharField(max_length=40)
     email = models.CharField(max_length=200)
     
     def __unicode__(self):
-        return self.sukunimi + ' ' + self.nimi
+        return self.lastname + ' ' + self.name
     

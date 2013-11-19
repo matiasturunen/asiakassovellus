@@ -1,7 +1,7 @@
 from django.contrib import admin
-from hallinta.models import Asiakas, Yhteyshenkilo
+from hallinta.models import Customer, Contact
 
-admin.site.register(Asiakas)
-admin.site.register(Yhteyshenkilo)
+admin.site.register(Customer)
+admin.site.register(Contact)
 
 # Register your models here.

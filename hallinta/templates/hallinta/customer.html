@@ -1,0 +1,35 @@
+{% if user.is_authenticated %}
+
+	<a href="{% url 'hallinta:logout_handle' %}">Log out</a>
+
+	<h1>{{ customer.name }}</h1>
+	<p>
+	Address: {{ customer.address }}<br/>
+	Contacts:
+	</p>
+	
+	{% if customer.contact_set.all.count < 1 %}
+	<!-- IF no contacts -->
+		<p>There is no contacts. <a href="{% url 'hallinta:add_contact_form' %}" >Add one now</a></p>
+	{% else %}
+		<table>
+			<tr>
+				<th>First name</th><th>Last name</th><th>Job description</th><th>Phone number</th><th>E-mail</th>
+			</tr>
+			{% for contact in customer.contact_set.all %}
+				
+				<tr>
+				<td>{{ contact.name }}</td><td>{{ contact.lastname }}</td><td>{{ contact.job }}</td><td>{{ contact.phone }}</td><td>{{ contact.email }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% endif %}
+	
+	
+
+	<p>Extra information: {{ customer.extrainfo }}</p>
+
+{% else %}
+<!-- redirect to login page -->
+	<meta http-equiv="REFRESH" content="0;url={% url 'hallinta:login' %}">
+{% endif %}

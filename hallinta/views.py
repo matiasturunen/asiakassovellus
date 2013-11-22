@@ -8,16 +8,18 @@ from compiler.ast import TryExcept
 from django.contrib.redirects.models import Redirect
 
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic.base import TemplateView
 
-class IndexView(generic.ListView):
+class IndexView(TemplateView):
     template_name = 'hallinta/index.html'
+
+class AllCustomersView(generic.ListView):
+    template_name = 'hallinta/allcustomers.html'
     context_object_name = 'all_customers'
     
     def get_queryset(self):
         return Customer.objects.all()
-    
-        
-   
+      
 class CustomerView(generic.DetailView):
     template_name = 'hallinta/customer.html'
     model = Customer
@@ -63,7 +65,7 @@ def addContact(request):
     con_customer = Customer.objects.get(id=customer_id)
     
     if(con_name == "" or con_lastname == "" or con_job == "" or con_phone == "" or con_email == ""):
-        return render(request, 'hallinta/newcontact.html', { 'error_message': 'Fill all fields!'})
+        return render(request, 'hallinta/newcontact.html', { 'error_message': 'Fill all fields!', 'all_customers': Customer.objects.all(),})
     else:
         # save data
         con = Contact(customer = con_customer, name = con_name, lastname = con_lastname, job = con_job, phone = con_phone, email = con_email)

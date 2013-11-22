@@ -1,15 +1,18 @@
 {% if user.is_authenticated %}
-	
-	<a href="{% url 'hallinta:logout_handle' %}">Log out</a>
+	<!-- Basic HTML stuff (title, head, beginning of body) -->
+	{% include 'hallinta/base_tpl_top.html' %}
+	<!-- Navigation -->
+	{% include 'hallinta/navbar.html' %}
 
-	<h1>All customers</h1>
-	{% if all_customers %}
-		<ul>
-		{% for customer in all_customers %}
-			<li><a href="{% url 'hallinta:customerinfo' customer.id %}">{{ customer.name }}</a></li>
-		{% endfor %}
-		</ul>
-	{% endif %}
+	
+	
+	
+	
+	
+	
+	
+	
+	{% include 'hallinta/base_tpl_bottom.html' %}
 
 {% else %}
 <!-- redirect to login page -->

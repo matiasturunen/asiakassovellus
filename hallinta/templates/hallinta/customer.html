@@ -1,35 +1,57 @@
 {% if user.is_authenticated %}
+<!-- Basic HTML stuff (title, head, beginning of body) -->
+{% include 'hallinta/base_tpl_top.html' %}
+<!-- Navigation -->
+{% include 'hallinta/navbar.html' %}
+<div class="container">
 
-	<a href="{% url 'hallinta:logout_handle' %}">Log out</a>
+	<h2>{{ customer.name }}</h2>
 
-	<h1>{{ customer.name }}</h1>
-	<p>
-	Address: {{ customer.address }}<br/>
-	Contacts:
-	</p>
-	
-	{% if customer.contact_set.all.count < 1 %}
-	<!-- IF no contacts -->
-		<p>There is no contacts. <a href="{% url 'hallinta:add_contact_form' %}" >Add one now</a></p>
-	{% else %}
-		<table>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">Address</div>
+		<div class="panel-body">{{ customer.address }}</div>
+	</div>
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">Contacts</div>
+
+		<!-- Table -->
+		{% if customer.contact_set.all.count < 1 %}
+		<!-- IF no contacts -->
+		<p>
+			There is no contacts. <a href="{% url 'hallinta:add_contact_form' %}">Add one now</a>
+		</p>
+		{% else %}
+		<table class="table">
 			<tr>
-				<th>First name</th><th>Last name</th><th>Job description</th><th>Phone number</th><th>E-mail</th>
+				<th>First name</th>
+				<th>Last name</th>
+				<th>Job description</th>
+				<th>Phone number</th>
+				<th>E-mail</th>
 			</tr>
 			{% for contact in customer.contact_set.all %}
-				
-				<tr>
-				<td>{{ contact.name }}</td><td>{{ contact.lastname }}</td><td>{{ contact.job }}</td><td>{{ contact.phone }}</td><td>{{ contact.email }}</td>
-				</tr>
+
+			<tr>
+				<td>{{ contact.name }}</td>
+				<td>{{ contact.lastname }}</td>
+				<td>{{ contact.job }}</td>
+				<td>{{ contact.phone }}</td>
+				<td>{{ contact.email }}</td>
+			</tr>
 			{% endfor %}
 		</table>
-	{% endif %}
-	
-	
+		{% endif %}
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">Extra information</div>
+		<div class="panel-body">{{ customer.extrainfo }}</div>
+	</div>
 
-	<p>Extra information: {{ customer.extrainfo }}</p>
+</div>
 
-{% else %}
+{% include 'hallinta/base_tpl_bottom.html' %} {% else %}
 <!-- redirect to login page -->
-	<meta http-equiv="REFRESH" content="0;url={% url 'hallinta:login' %}">
+<meta http-equiv="REFRESH" content="0;url={% url 'hallinta:login' %}">
 {% endif %}

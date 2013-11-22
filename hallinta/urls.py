@@ -4,7 +4,8 @@ from hallinta import views
 
 urlpatterns = patterns('',
     # paasivulla kaikki asiakkaat
-    url(r'^showall/$', views.IndexView.as_view(), name='show_all'),
+    url(r'^index/$', views.IndexView.as_view(), name='index'),
+    url(r'^showall/$', views.AllCustomersView.as_view(), name='show_all'),
     url(r'^specifics/(?P<pk>\d+)/$', views.CustomerView.as_view(), name='customerinfo'),
     url(r'^new/customer/$', views.NewCustomerView.as_view(), name='add_customer_form'),
     url(r'^new/customer/add/$', views.addCustomer, name='add_customer_new'),

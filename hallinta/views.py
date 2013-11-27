@@ -2,17 +2,21 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views import generic
-
 from hallinta.models import Customer, Contact
 from compiler.ast import TryExcept
 from django.contrib.redirects.models import Redirect
-
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView
 
+# index page, currently empty
 class IndexView(TemplateView):
     template_name = 'hallinta/index.html'
 
+
+ 
+#===============================================================================
+# Customer related
+#===============================================================================
 class AllCustomersView(generic.ListView):
     template_name = 'hallinta/allcustomers.html'
     context_object_name = 'all_customers'
@@ -28,16 +32,6 @@ class NewCustomerView(generic.ListView):
     template_name = 'hallinta/newcustomer.html'
     model = Customer
     
-class NewContactView(generic.ListView):
-    template_name = 'hallinta/newcontact.html'
-    context_object_name = 'all_customers'
-    
-    def get_queryset(self):
-        return Customer.objects.all()
-
-class LoginView(generic.TemplateView):
-    template_name = 'hallinta/login.html'
-    
 def addCustomer(request):
     cus_name = request.POST['name']
     cus_address = request.POST['address']
@@ -51,7 +45,41 @@ def addCustomer(request):
     
         return HttpResponseRedirect(reverse('hallinta:show_all'))
 
+class editCustomerView(generic.DetailView):
+    template_name = 'hallinta/editcustomer.html'
+    model = Customer
+
+def handleCustomerEdit(request, pk):
+    customer = get_object_or_404(Customer,id=pk)
+    cus_name = request.POST['name']
+    cus_address = request.POST['address']
+    cus_info = request.POST['extrainfo']
+    if(cus_name == "" or cus_address == "" or cus_info == ""):
+        return render(request, 'hallinta/editcustomer.html', { 'error_message': 'Fill all fields!', 'customer': customer,})
+    else:
+        customer.name = cus_name
+        customer.address = cus_address
+        customer.extrainfo = cus_info
+        customer.save()
     
+        return HttpResponseRedirect(reverse('hallinta:customerinfo', args=(customer.id,)))
+
+def removeCustomer(request, cus_id):  
+    customer = get_object_or_404(Customer, id=cus_id)
+    customer.delete()
+    
+    return HttpResponseRedirect(reverse('hallinta:show_all'))      
+
+
+#===============================================================================
+# Contact related
+#===============================================================================
+class NewContactView(generic.ListView):
+    template_name = 'hallinta/newcontact.html'
+    context_object_name = 'all_customers'
+    
+    def get_queryset(self):
+        return Customer.objects.all()
 
 def addContact(request):
     customer_id = request.POST['customer']
@@ -71,9 +99,51 @@ def addContact(request):
         con = Contact(customer = con_customer, name = con_name, lastname = con_lastname, job = con_job, phone = con_phone, email = con_email)
         con.save()
         
-        return HttpResponseRedirect(reverse('hallinta:show_all'))
+        return HttpResponseRedirect(reverse('hallinta:customerinfo', args=(con_customer.id,)))
+   
+def editContactView(request, cus_id, con_id):
+    template_name = 'hallinta/editcontact.html'
+    customer = get_object_or_404(Customer, id=cus_id)
+    contact = get_object_or_404(Contact, id=con_id)
+    return render(request, template_name, {'customer': customer, 'contact': contact,})
+     
+def handleContactEdit(request, cus_id, con_id):
+    customer = get_object_or_404(Customer, id=cus_id)
+    contact = get_object_or_404(Contact, id=con_id)
+    con_name = request.POST['name']
+    con_lastname = request.POST['lastname']
+    con_job = request.POST['job']
+    con_phone = request.POST['phone']
+    con_email = request.POST['email']
+    
+    if(con_name == "" or con_lastname == "" or con_job == "" or con_phone == "" or con_email == ""):
+        return render(request, 'hallinta/editcontact.html', { 'error_message': 'Fill all fields!', 'customer': customer, 'contact': contact,})
+    else:
+        # save data
+        contact.customer = customer
+        contact.name = con_name
+        contact.lastname = con_lastname
+        contact.job = con_job
+        contact.phone = con_phone
+        contact.email = con_email
+        
+        contact.save()
+        
+        return HttpResponseRedirect(reverse('hallinta:customerinfo', args=(customer.id,)))
+
+def removeContact(request, cus_id, con_id):
+    contact = get_object_or_404(Contact, id=con_id)
+    contact.delete()
+    
+    return HttpResponseRedirect(reverse('hallinta:customerinfo', args=(cus_id,)))
 
 
+#===============================================================================
+# Login related
+#===============================================================================
+class LoginView(generic.TemplateView):
+    template_name = 'hallinta/login.html'
+    
 def handleLogin(request):
     username = request.POST['username']
     password = request.POST['password']
@@ -89,8 +159,7 @@ def handleLogin(request):
     else:
         # user or passw wrong
         return HttpResponseRedirect(reverse('hallinta:login'))
-    
-    
+     
 def handleLogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('hallinta:login'))

@@ -5,8 +5,10 @@
 {% include 'hallinta/navbar.html' %}
 <div class="container">
 
-	<h2>{{ customer.name }}</h2>
-
+	<h2 id="customername">{{ customer.name }}</h2>
+	<a href="{% url 'hallinta:edit_customer_form' customer.id %}">Edit</a>
+	<p></p>
+	<a href="{% url 'hallinta:customer_remove' customer.id %}" class="deletecustomer">Remove</a>
 
 	<div class="panel panel-default">
 		<div class="panel-heading">Address</div>
@@ -30,6 +32,7 @@
 				<th>Job description</th>
 				<th>Phone number</th>
 				<th>E-mail</th>
+				<th>Options</th>
 			</tr>
 			{% for contact in customer.contact_set.all %}
 
@@ -39,6 +42,7 @@
 				<td>{{ contact.job }}</td>
 				<td>{{ contact.phone }}</td>
 				<td>{{ contact.email }}</td>
+				<td><a href="{% url 'hallinta:edit_contact_form' customer.id contact.id %}"><span class="glyphicon glyphicon-refresh"></span></a><span>&nbsp&nbsp&nbsp&nbsp</span><a href="{% url 'hallinta:contact_remove' customer.id contact.id %}" class="deletelink"><span class="glyphicon glyphicon-remove"></span></a></td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -51,7 +55,11 @@
 
 </div>
 
-{% include 'hallinta/base_tpl_bottom.html' %} {% else %}
+{% load staticfiles %}
+<script src="{% static 'hallinta/script.js' %}"></script>
+{% include 'hallinta/base_tpl_bottom.html' %} 
+
+{% else %}
 <!-- redirect to login page -->
 <meta http-equiv="REFRESH" content="0;url={% url 'hallinta:login' %}">
 {% endif %}

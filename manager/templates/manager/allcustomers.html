@@ -1,0 +1,27 @@
+
+<!-- Basic HTML stuff (title, head, beginning of body) -->
+{% include 'manager/structure/base_tpl_top.html' %}
+<!-- Navigation -->
+{% include 'manager/structure/navbar.html' %}
+
+<div class="container">
+
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">All customers</div>
+
+		<!-- List group -->
+		
+			{% if all_customers %}
+			<ul class="list-group">
+				{% for customer in all_customers %}
+				<li class="list-group-item"><a href="{% url 'manager:customerinfo' customer.id %}">{{ customer.name }}</a></li> 
+				{% endfor %}
+			</ul>
+			{% endif %}
+
+	</div>
+
+
+</div>
+{% include 'manager/structure/base_tpl_bottom.html' %}

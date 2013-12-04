@@ -1,0 +1,45 @@
+
+	<!-- Basic HTML stuff (title, head, beginning of body) -->
+	{% include 'manager/structure/base_tpl_top.html' %}
+	<!-- Navigation -->
+	{% include 'manager/structure/navbar.html' %}
+	
+	
+<div class="container">	
+	<h1>Edit contact {{ contact.name }} {{ contact.lastname }}</h1>
+	{% if error_message %} 
+		<div class="alert alert-danger">{{ error_message }}</div>
+	{% endif %}
+	<form action="{% url 'manager:edit_contact_handle' customer.id contact.id  %}" method="post" role="form">
+		{% csrf_token %} 
+		<div class="form-group">
+			<label for="name">Customer</label>
+			<input class="form-control" type="text" name="customer" id="customer" value="{{ customer.name }}" readonly/> 
+		</div>
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input class="form-control" type="text" name="name" id="name" value="{{ contact.name }}"/> 
+		</div>
+		<div class="form-group">
+			<label for="lastname">Lastname</label>
+			<input class="form-control" type="text" name="lastname" id="lastname" value="{{ contact.lastname }}"/>
+		</div>
+		<div class="form-group">
+			<label for="job">Job description</label>
+			<input class="form-control" type="text" name="job" id="job" value="{{ contact.job }}"/> 
+		</div>
+		<div class="form-group">
+			<label for="phone">Phone</label>
+			<input class="form-control" type="text" name="phone" id="phone" value="{{ contact.phone }}" /> 
+		</div>
+		<div class="form-group">
+			<label for="email">E-mail</label>
+			<input class="form-control" type="email" name="email" id="email" value="{{ contact.email }}"/> 
+		</div>
+
+		<button type="submit" class="btn btn-success">Confirm changes</button>
+	
+	</form>
+	
+</div>
+	{% include 'manager/structure/base_tpl_bottom.html' %}

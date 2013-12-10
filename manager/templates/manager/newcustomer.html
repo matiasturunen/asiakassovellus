@@ -9,21 +9,15 @@
 	{% if error_message %} 
 		<div class="alert alert-danger">{{ error_message }}</div>
 	{% endif %}
-	<form action="{% url 'manager:add_customer_new' %}" method="post" role="form">
+	<form action="" method="post" role="form">
 	{% csrf_token %}
+	{% for field in form %}
 		<div class="form-group">
-			<label for="name">Name</label>
-			<input type="text" name="name" placeholder="Name of customer" id="name" class="form-control"/>	
+			{{ field.errors }}
+            {{ field.label_tag }} {{ field }}
 		</div>
-		<div class="form-group">
-			<label for="address">Address</label>
-			<input type="text" name="address" placeholder="Address" id="address" class="form-control"/>	
-		</div>
-		<div class="form-group">
-			<label for="extrainfo">More information</label>
-			<textarea cols="40" name="extrainfo" rows="10" placeholder="More information..." id="extrainfo" class="form-control"></textarea>
-		</div>
-		<button type="submit" class="btn btn-success">Add</button>
+	{% endfor %}
+	<button type="submit" class="btn btn-success">Add</button>
 	</form>
 	
 </div>

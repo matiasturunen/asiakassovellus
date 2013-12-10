@@ -3,11 +3,11 @@ from manager import views
 
 urlpatterns = patterns('',
     # index page
-    url(r'^index/$', views.IndexView.as_view(), name='index'),
+    url(r'^index/$', views.IndexView, name='index'),
     # show all customers
-    url(r'^showall/$', views.AllCustomersView.as_view(), name='show_all'),
+    url(r'^showall/$', views.AllCustomersView, name='show_all'),
     # show info from specific customer
-    url(r'^customer/(?P<pk>\d+)/$', views.CustomerView.as_view(), name='customerinfo'),
+    url(r'^customer/(?P<pk>\d+)/$', views.CustomerView, name='customerinfo'),
     
     
     #===========================================================================
@@ -15,13 +15,9 @@ urlpatterns = patterns('',
     #===========================================================================
     
     # show new customer view
-    url(r'^customer/new/$', views.NewCustomerView.as_view(), name='add_customer_form'),
-    # handle new customer adding
-    url(r'^customer/new/add/$', views.addCustomer, name='add_customer_new'),
+    url(r'^customer/new/$', views.NewCustomerView, name='add_customer_form'),
     # show new contact view
-    url(r'^contact/new/$', views.NewContactView.as_view(), name='add_contact_form'),
-    # handle new contact adding
-    url(r'^new/contact/new/add/$', views.addContact, name='add_contact_new'),
+    url(r'^contact/new/$', views.NewContactView, name='add_contact_form'),
     
     
     #===========================================================================
@@ -29,14 +25,10 @@ urlpatterns = patterns('',
     #===========================================================================
     
     # edit customer data
-    url(r'^customer/(?P<pk>\d+)/edit/$', views.editCustomerView.as_view(), name='edit_customer_form'),
-    # handle customer editing
-    url(r'^customer/(?P<pk>\d+)/edit/handle$', views.handleCustomerEdit, name='edit_customer_handle'),
+    url(r'^customer/(?P<pk>\d+)/edit/$', views.editCustomerView, name='edit_customer_form'),
     # edit contact data
     url(r'^customer/(?P<cus_id>\d+)/contact/(?P<con_id>\d+)/edit/$', views.editContactView, name='edit_contact_form'),
-    # handle contact editing
-    url(r'^customer/(?P<cus_id>\d+)/contact/(?P<con_id>\d+)/edit/handle$', views.handleContactEdit, name='edit_contact_handle'),
-    
+       
     
     #===========================================================================
     # removing
@@ -53,7 +45,7 @@ urlpatterns = patterns('',
     #===========================================================================
     
     # login at front page
-    url(r'^$', views.LoginView.as_view(), name='login'),
+    url(r'^$', views.LoginView, name='login'),
     # handle login
     url(r'^login/handle/$', views.handleLogin, name='login_handle'),
     # handle logout

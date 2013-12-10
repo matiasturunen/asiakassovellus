@@ -2,73 +2,99 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views import generic
-from manager.models import Customer, Contact
+from manager.models import Customer, Contact, CustomerForm, ContactForm
 from compiler.ast import TryExcept
 from django.contrib.redirects.models import Redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
+from django.forms.models import modelformset_factory, modelform_factory
+from django.forms import ModelForm, forms, formsets
+from django.forms.formsets import formset_factory
+
 
 # index page, currently empty
-# login_url_own = reverse('manager:login')
 
-# @login_required(login_url = login_url_own)
-class IndexView(TemplateView):
+def IndexView(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/index.html'
+    return render(request,template_name)
 
 
  
 #===============================================================================
 # Customer related
 #===============================================================================
-class AllCustomersView(generic.ListView):
-    template_name = 'manager/allcustomers.html'
-    context_object_name = 'all_customers'
+def AllCustomersView(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
     
-    def get_queryset(self):
-        return Customer.objects.all()
+    template_name = 'manager/allcustomers.html'   
+    return render(request,template_name,{'all_customers': Customer.objects.all(), })
+    
       
-class CustomerView(generic.DetailView):
+def CustomerView(request, pk):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/customer.html'
-    model = Customer
+    customer = get_object_or_404(Customer, id=pk)
+    return render(request, template_name, {'customer': customer,})
     
-class NewCustomerView(generic.ListView):
+def NewCustomerView(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/newcustomer.html'
-    model = Customer
     
-def addCustomer(request):
-    cus_name = request.POST['name']
-    cus_address = request.POST['address']
-    cus_info = request.POST['extrainfo']
-    if(cus_name == "" or cus_address == "" or cus_info == ""):
-        
-        return render(request, 'manager/newcustomer.html', { 'error_message': 'Fill all fields!', })
+    # empty form
+    customer_form = CustomerForm
+    
+    if request.method == 'POST':
+        form = customer_form(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('manager:show_all'))
+            
     else:
-        c = Customer(name=cus_name, address=cus_address, extrainfo=cus_info)
-        c.save()
+        form = customer_form
     
-        return HttpResponseRedirect(reverse('manager:show_all'))
+    return render(request, template_name, {'form': form, })
+    
+    
 
-class editCustomerView(generic.DetailView):
+
+def editCustomerView(request, pk):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/editcustomer.html'
-    model = Customer
-
-def handleCustomerEdit(request, pk):
-    customer = get_object_or_404(Customer,id=pk)
-    cus_name = request.POST['name']
-    cus_address = request.POST['address']
-    cus_info = request.POST['extrainfo']
-    if(cus_name == "" or cus_address == "" or cus_info == ""):
-        return render(request, 'manager/editcustomer.html', { 'error_message': 'Fill all fields!', 'customer': customer,})
-    else:
-        customer.name = cus_name
-        customer.address = cus_address
-        customer.extrainfo = cus_info
-        customer.save()
     
-        return HttpResponseRedirect(reverse('manager:customerinfo', args=(customer.id,)))
+    # get editable customer
+    customer = get_object_or_404(Customer, id=pk)
+    
+    # empty form
+    customer_form = CustomerForm
+
+    if request.method == 'POST':
+        form = customer_form(request.POST, instance = customer)
+        if form.is_valid():
+            form.save()
+            
+            return HttpResponseRedirect(reverse('manager:customerinfo', args=(customer.id,)))
+    
+    else:
+        form = customer_form(instance = customer)
+          
+    return render(request, template_name, {'form': form, })
+
 
 def removeCustomer(request, cus_id):  
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     customer = get_object_or_404(Customer, id=cus_id)
     customer.delete()
     
@@ -78,40 +104,51 @@ def removeCustomer(request, cus_id):
 #===============================================================================
 # Contact related
 #===============================================================================
-class NewContactView(generic.ListView):
+def NewContactView(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/newcontact.html'
-    context_object_name = 'all_customers'
     
-    def get_queryset(self):
-        return Customer.objects.all()
-
-def addContact(request):
-    customer_id = request.POST['customer']
-    con_name = request.POST['name']
-    con_lastname = request.POST['lastname']
-    con_job = request.POST['job']
-    con_phone = request.POST['phone']
-    con_email = request.POST['email']
-    
-    #get customer
-    con_customer = Customer.objects.get(id=customer_id)
-    
-    if(con_name == "" or con_lastname == "" or con_job == "" or con_phone == "" or con_email == ""):
-        return render(request, 'manager/newcontact.html', { 'error_message': 'Fill all fields!', 'all_customers': Customer.objects.all(),})
+    contact_form = ContactForm
+    if request.method == 'POST':
+        form = contact_form(request.POST)
+        if form.is_valid():
+            form.save()
+            
+            return HttpResponseRedirect(reverse('manager:show_all'))
     else:
-        # save data
-        con = Contact(customer = con_customer, name = con_name, lastname = con_lastname, job = con_job, phone = con_phone, email = con_email)
-        con.save()
+        form = contact_form()
         
-        return HttpResponseRedirect(reverse('manager:customerinfo', args=(con_customer.id,)))
-   
+    return render(request, template_name, {'form': form, })
+
+
+ 
 def editContactView(request, cus_id, con_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     template_name = 'manager/editcontact.html'
-    customer = get_object_or_404(Customer, id=cus_id)
+    
     contact = get_object_or_404(Contact, id=con_id)
-    return render(request, template_name, {'customer': customer, 'contact': contact,})
+    
+    contact_form = ContactForm
+    if request.method == 'POST':
+        form = contact_form(request.POST, instance = contact)
+        if form.is_valid():
+            form.save()
+            
+            return HttpResponseRedirect(reverse('manager:customerinfo', args=(cus_id,)))
+    else:
+        form = contact_form(instance = contact)
+        
+    return render(request,template_name, {'form': form, 'contact': contact, })
+
      
 def handleContactEdit(request, cus_id, con_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     customer = get_object_or_404(Customer, id=cus_id)
     contact = get_object_or_404(Contact, id=con_id)
     con_name = request.POST['name']
@@ -136,6 +173,9 @@ def handleContactEdit(request, cus_id, con_id):
         return HttpResponseRedirect(reverse('manager:customerinfo', args=(customer.id,)))
 
 def removeContact(request, cus_id, con_id):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('manager:login'))
+    
     contact = get_object_or_404(Contact, id=con_id)
     contact.delete()
     
@@ -145,8 +185,9 @@ def removeContact(request, cus_id, con_id):
 #===============================================================================
 # Login related
 #===============================================================================
-class LoginView(generic.TemplateView):
+def LoginView(request):
     template_name = 'manager/login.html'
+    return render(request, template_name)
     
 def handleLogin(request):
     username = request.POST['username']
@@ -167,4 +208,5 @@ def handleLogin(request):
 def handleLogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('manager:login'))
+
     
